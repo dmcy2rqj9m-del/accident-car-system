@@ -35,4 +35,4 @@ app.use('/api/ai', aiRouter);
 app.get('/', (req, res) => res.send('事故车线索示例后端运行中'));
 
 const port = process.env.PORT || 3000;
-app.listen(port, ()=> console.log('Server started on port', port));
+app.listen(port, ()=> console.debug('Server started on port', port));
