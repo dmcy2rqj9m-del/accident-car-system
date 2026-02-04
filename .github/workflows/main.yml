@@ -1,0 +1,43 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install backend dependencies
+        run: |
+          cd projects/backend
+          npm ci
+
+      - name: Start backend
+        run: |
+          cd projects/backend
+          npm start &
+          # wait for server to be ready (up to ~30s)
+          for i in {1..30}; do
+            if curl -sSf http://localhost:3000/ >/dev/null; then
+              echo "backend ready"
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Run smoke-test script
+        run: |
+          node scripts/smoke-test.js
+        env:
+          BASE_URL: http://localhost:3000
